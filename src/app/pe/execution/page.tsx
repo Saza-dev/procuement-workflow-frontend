@@ -21,6 +21,8 @@ export default function ExecutionDashboard() {
     message: string;
     variance?: number;
   } | null>(null);
+  const [invoiceFile, setInvoiceFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const fetchApprovedRequests = useCallback(async () => {
     try {
@@ -36,22 +38,37 @@ export default function ExecutionDashboard() {
   }, [fetchApprovedRequests]);
 
   const handlePurchase = async () => {
-    if (!selectedReq || !invoiceNumber || !finalTotalCost) {
-      return toast.error("Please fill in all fields!");
+    // 1. Validation: Ensure we have the file!
+    if (!selectedReq || !invoiceNumber || !finalTotalCost || !invoiceFile) {
+      return toast.error(
+        "Please fill in all fields and upload the invoice file.",
+      );
     }
+
     setGuardrailAlert(null);
+    const loadingToast = toast.loading("Finalizing purchase...");
+
     try {
-      await WorkflowAPI.finalizePurchase(selectedReq.id, {
-        invoiceNumber,
-        finalTotalCost: Number(finalTotalCost),
-        actorId: 2,
-      });
-      toast.success("Purchase finalized successfully! Moved to Inventory.");
+      // 2. Prepare FormData
+      const formData = new FormData();
+      formData.append("invoiceNumber", invoiceNumber);
+      formData.append("finalTotalCost", String(finalTotalCost));
+      formData.append("actorId", "2"); // Replace with actual logged-in user ID
+      formData.append("quoteFile", invoiceFile); // 'quoteFile' must match the backend upload.single("quoteFile")
+
+      // 3. Send to API
+      await WorkflowAPI.finalizePurchase(selectedReq.id, formData);
+
+      toast.success("Purchase finalized successfully!", { id: loadingToast });
+
+      // 4. Reset State
       setSelectedReq(null);
       setInvoiceNumber("");
       setFinalTotalCost("");
+      setInvoiceFile(null);
       fetchApprovedRequests();
     } catch (error: any) {
+      toast.dismiss(loadingToast);
       if (error.response?.status === 403) {
         setGuardrailAlert({
           triggered: true,
@@ -61,7 +78,7 @@ export default function ExecutionDashboard() {
         fetchApprovedRequests();
         setSelectedReq(null);
       } else {
-        toast.error("An error occurred while finalizing the purchase.");
+        toast.error("Failed to finalize purchase.");
       }
     }
   };
@@ -412,6 +429,48 @@ export default function ExecutionDashboard() {
                       }}
                     />
                   </div>
+
+                  {/* File Upload Section */}
+                  <div className="space-y-2">
+                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                      Upload Invoice / Receipt{" "}
+                      <span className="text-red-500">*</span>
+                    </label>
+                    <div
+                      className="border-2 border-dashed rounded-xl p-6 transition-all flex flex-col items-center justify-center gap-2 cursor-pointer"
+                      style={{
+                        borderColor: invoiceFile ? "#22c55e" : "#e2e8f0",
+                        background: invoiceFile ? "#f0fdf4" : "#f8fafc",
+                      }}
+                      onClick={() =>
+                        document.getElementById("file-upload")?.click()
+                      }
+                    >
+                      <input
+                        id="file-upload"
+                        type="file"
+                        className="hidden"
+                        accept=".pdf,image/*"
+                        onChange={(e) =>
+                          setInvoiceFile(e.target.files?.[0] || null)
+                        }
+                      />
+                      <div className="text-2xl">
+                        {invoiceFile ? "📄" : "📤"}
+                      </div>
+                      <div className="text-center">
+                        <p className="text-sm font-medium text-slate-700">
+                          {invoiceFile
+                            ? invoiceFile.name
+                            : "Click to select invoice"}
+                        </p>
+                        <p className="text-xs text-slate-400 mt-0.5">
+                          PDF or Image (Max 5MB)
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
                 </div>
 
                 <div className="pt-2">

@@ -77,7 +77,7 @@ export const WorkflowAPI = {
   getApprovedRequests: () => apiClient.get("/requests?status=APPROVED"),
   finalizePurchase: (
     reqId: number,
-    data: { invoiceNumber: string; finalTotalCost: number; actorId: number },
+    data: FormData,
   ) => apiClient.post(`/requests/${reqId}/purchase`, data),
 
   // --- Phase 5: Inventory ---
