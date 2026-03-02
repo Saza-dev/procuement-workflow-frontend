@@ -1,7 +1,8 @@
 import axios from "axios";
 
 // Map this to your Express server port
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api";
+const API_URL =
+  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5001/api";
 
 const apiClient = axios.create({
   baseURL: API_URL,
@@ -30,7 +31,7 @@ export const WorkflowAPI = {
   // login
   login: (data: loginUser) => apiClient.post("/auth/login", data),
 
-  me:()=> apiClient.get("/auth/me"),
+  me: () => apiClient.get("/auth/me"),
 
   // --- Phase 1: Initiation ---
   createBasket: (data: CreateRequestData) => apiClient.post("/requests", data),

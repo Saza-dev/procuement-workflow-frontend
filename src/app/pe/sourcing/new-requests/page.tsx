@@ -60,7 +60,7 @@ export default function NewRequestsSourcing() {
     if (!selectedReq || splitItems.length === 0) return;
     try {
       await axios.post(
-        `http://localhost:5001/api/requests/${selectedReq.id}/split`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/requests/${selectedReq.id}/split`,
         {
           itemIds: splitItems,
         },
