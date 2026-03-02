@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { WorkflowAPI } from "@/lib/api";
+import { toast } from "sonner";
 
 interface BasketItem {
   description: string;
@@ -31,15 +32,15 @@ export default function SmartBasketDashboard() {
         requesterId: 1,
       });
       setRequestId(res.data.id);
-      alert(`Basket created! Request ID: ${res.data.id}`);
+      toast.success(`Basket created! Request ID: ${res.data.id}`);
     } catch (error) {
       console.error(error);
-      alert("Failed to create basket");
+      toast.error("Failed to create basket");
     }
   };
 
   const handleAddItem = async () => {
-    if (!requestId) return alert("Create a basket first!");
+    if (!requestId) return toast.success("Create a basket first!");
     try {
       const res = await WorkflowAPI.addItem(requestId, {
         description: desc,
@@ -56,7 +57,7 @@ export default function SmartBasketDashboard() {
       setUrgent(false);
     } catch (error) {
       console.error(error);
-      alert("Failed to add item");
+      toast.error("Failed to add item");
     }
   };
 
@@ -64,14 +65,14 @@ export default function SmartBasketDashboard() {
     if (!requestId) return;
     try {
       await WorkflowAPI.submitRequest(requestId);
-      alert("Request Submitted Successfully! Locked for Phase 1.");
+      toast.success("Request Submitted Successfully! Locked for Phase 1.");
       setRequestId(null);
       setTitle("");
       setJustification("");
       setItems([]);
     } catch (error) {
       console.error(error);
-      alert("Failed to submit request");
+      toast.error("Failed to submit request");
     }
   };
 

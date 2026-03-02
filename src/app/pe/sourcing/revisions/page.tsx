@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { WorkflowAPI } from "@/lib/api";
+import { toast } from "sonner";
 
 interface Approval {
   id: number;
@@ -56,13 +57,13 @@ export default function RevisionsSourcing() {
   const saveSourcing = async (itemId: number) => {
     if (!selectedReq) return;
     const data = edits[itemId];
-    if (!data?.actualPrice) return alert("Please enter a valid price.");
+    if (!data?.actualPrice) return toast.error("Please enter a valid price.");
     try {
       await WorkflowAPI.updateSourcing(selectedReq.id, itemId, data);
-      alert("Item pricing updated!");
+      toast.success("Item pricing updated!");
       fetchRequests();
     } catch {
-      alert("Failed to update sourcing");
+      toast.error("Failed to update sourcing");
     }
   };
 
@@ -74,12 +75,12 @@ export default function RevisionsSourcing() {
         { itemIds: splitItems },
         { withCredentials: true },
       );
-      alert("Items split into a new request!");
+      toast.success("Items split into a new request!");
       setSplitItems([]);
       setSelectedReq(null);
       fetchRequests();
     } catch {
-      alert("Failed to execute split.");
+      toast.error("Failed to execute split.");
     }
   };
 
@@ -87,13 +88,13 @@ export default function RevisionsSourcing() {
     if (!selectedReq) return;
     try {
       await WorkflowAPI.resubmitRequest(selectedReq.id, 2);
-      alert(
+      toast.success(
         `Successfully Resubmitted! Incrementing to Version ${selectedReq.version + 1}`,
       );
       setSelectedReq(null);
       fetchRequests();
     } catch {
-      alert("Failed to resubmit request.");
+      toast.error("Failed to resubmit request.");
     }
   };
 

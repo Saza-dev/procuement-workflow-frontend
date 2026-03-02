@@ -5,6 +5,7 @@ import { WorkflowAPI } from "@/lib/api";
 import { ApprovalItem, GhostDiffData, UserRole } from "@/types/approvals";
 import ApprovalQueue from "@/components/approvals/ApprovalQueue";
 import ReviewPanel from "@/components/approvals/ReviewPanel";
+import { toast } from "sonner";
 
 export default function ApprovalsDashboard() {
   const [activeRole, setActiveRole] = useState<UserRole>({
@@ -57,11 +58,11 @@ export default function ApprovalsDashboard() {
         decision,
         comment,
       });
-      alert(`Request ${decision}D successfully!`);
+      toast.success(`Request ${decision}D successfully!`);
       setSelectedApp(null);
       fetchApprovals();
     } catch (error) {
-      alert("Failed to process approval");
+      toast.error("Failed to process approval");
       console.error(error);
     }
   };

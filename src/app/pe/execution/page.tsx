@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { WorkflowAPI } from "@/lib/api";
+import { toast } from "sonner";
 
 interface ApprovedRequest {
   id: number;
@@ -36,7 +37,7 @@ export default function ExecutionDashboard() {
 
   const handlePurchase = async () => {
     if (!selectedReq || !invoiceNumber || !finalTotalCost) {
-      return alert("Please fill in all fields!");
+      return toast.error("Please fill in all fields!");
     }
     setGuardrailAlert(null);
     try {
@@ -45,7 +46,7 @@ export default function ExecutionDashboard() {
         finalTotalCost: Number(finalTotalCost),
         actorId: 2,
       });
-      alert("Purchase finalized successfully! Moved to Inventory.");
+      toast.success("Purchase finalized successfully! Moved to Inventory.");
       setSelectedReq(null);
       setInvoiceNumber("");
       setFinalTotalCost("");
@@ -60,7 +61,7 @@ export default function ExecutionDashboard() {
         fetchApprovedRequests();
         setSelectedReq(null);
       } else {
-        alert("An error occurred while finalizing the purchase.");
+        toast.error("An error occurred while finalizing the purchase.");
       }
     }
   };

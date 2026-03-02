@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { WorkflowAPI } from "@/lib/api";
+import { toast } from "sonner";
 
 interface SourcingItem {
   id: number;
@@ -46,13 +47,13 @@ export default function NewRequestsSourcing() {
   const saveSourcing = async (itemId: number) => {
     if (!selectedReq) return;
     const data = edits[itemId];
-    if (!data?.actualPrice) return alert("Please enter a valid price.");
+    if (!data?.actualPrice) return toast.error("Please enter a valid price.");
     try {
       await WorkflowAPI.updateSourcing(selectedReq.id, itemId, data);
-      alert("Item sourcing updated!");
+      toast.success("Item sourcing updated!");
       fetchRequests();
     } catch {
-      alert("Failed to update sourcing");
+      toast.error("Failed to update sourcing");
     }
   };
 
@@ -65,12 +66,12 @@ export default function NewRequestsSourcing() {
           itemIds: splitItems,
         },
       );
-      alert("Items split into a new request!");
+      toast.success("Items split into a new request!");
       setSplitItems([]);
       setSelectedReq(null);
       fetchRequests();
     } catch {
-      alert("Failed to execute split.");
+      toast.error("Failed to execute split.");
     }
   };
 
@@ -78,11 +79,11 @@ export default function NewRequestsSourcing() {
     if (!selectedReq) return;
     try {
       await WorkflowAPI.dispatchToApprovers(selectedReq.id, 2);
-      alert("Successfully Dispatched to Approvers!");
+      toast.success("Successfully Dispatched to Approvers!");
       setSelectedReq(null);
       fetchRequests();
     } catch (error: any) {
-      alert(
+      toast.error(
         error.response?.data?.error ||
           "Failed to dispatch. Did you source all items?",
       );

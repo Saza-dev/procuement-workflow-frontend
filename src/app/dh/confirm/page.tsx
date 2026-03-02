@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { WorkflowAPI } from "@/lib/api";
+import { toast } from "sonner";
 
 interface AssetItem {
   id: number;
@@ -40,12 +41,12 @@ export default function ConfirmReceiptDashboard() {
     if (!selectedReq) return;
     try {
       await WorkflowAPI.confirmReceipt(selectedReq.id, 1);
-      alert("Receipt Confirmed! The workflow is officially DONE.");
+      toast.success("Receipt Confirmed! The workflow is officially DONE.");
       setSelectedReq(null);
       fetchHandedOverRequests();
     } catch (error: unknown) {
       console.error("Failed to confirm receipt", error);
-      alert("Failed to confirm receipt");
+      toast.error("Failed to confirm receipt");
     }
   };
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { WorkflowAPI } from "@/lib/api";
+import { toast } from "sonner";
 
 interface InventoryItem {
   id: number;
@@ -49,7 +50,7 @@ export default function InventoryDashboard() {
     if (!selectedReq) return;
     const data = tags[itemId];
     if (!data?.assetId || !data?.condition) {
-      return alert("Both Asset ID and Condition are required to tag an item.");
+      return toast.info("Both Asset ID and Condition are required to tag an item.");
     }
     try {
       await WorkflowAPI.receiveAsset(selectedReq.id, itemId, {
@@ -65,7 +66,7 @@ export default function InventoryDashboard() {
       );
     } catch (error) {
       console.error(error);
-      alert("Failed to tag asset");
+      toast.error("Failed to tag asset");
     }
   };
 
@@ -73,11 +74,11 @@ export default function InventoryDashboard() {
     if (!selectedReq) return;
     try {
       await WorkflowAPI.handoverToDepartment(selectedReq.id, 6);
-      alert("All items handed over to the Department Head!");
+      toast.success("All items handed over to the Department Head!");
       setSelectedReq(null);
       fetchInventory();
     } catch (error: any) {
-      alert(
+      toast.error(
         error.response?.data?.error ||
           "Failed to handover. Please ensure ALL items are tagged.",
       );

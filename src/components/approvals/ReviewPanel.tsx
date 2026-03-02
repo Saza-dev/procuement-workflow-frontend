@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ApprovalItem, GhostDiffData } from "@/types/approvals";
+import { toast } from "sonner";
 
 interface ReviewPanelProps {
   selectedApp: ApprovalItem | null;
@@ -18,7 +19,7 @@ export default function ReviewPanel({
 
   const handleAction = (decision: "APPROVE" | "REJECT") => {
     if (decision === "REJECT" && !comment.trim()) {
-      return alert("A comment is strictly required to reject a request.");
+      return toast.info("A comment is strictly required to reject a request.");
     }
     onDecision(decision, comment);
     setComment("");
